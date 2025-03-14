@@ -111,5 +111,54 @@ public class SequentialDataIO implements DataIO {
 
         return null;
     }
+
+    @Override
+    public void updateRegistry(short id, Document document) {
+        try (RandomAccessFile raf = new RandomAccessFile(path, "rw")) {
+            BinaryDocument oldDocument = deleteRegistry(id);
+            if (oldDocument == null) return;
+
+            BinaryDocument binaryDocument = BinaryDocument.fromDocument(oldDocument.getMovie().getId(), document);
+            byte[] bytes = binaryDocument.toByteArray();
+
+            raf.seek(raf.length());
+
+            raf.writeInt(bytes.length);
+            raf.writeBoolean(false);
+            raf.write(bytes);
+         } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    @Override
+    public BinaryDocument getNextRegistry(RandomAccessFile raf) {
+        try {
+            short currentId = -1;
+
+            do {
+                int registrySize = raf.readInt();
+                boolean isRegistryDeleted = raf.readBoolean();
+                currentId = raf.readShort();
+                System.out.println(currentId);
+
+
+                if (isRegistryDeleted) {
+                    raf.skipBytes(registrySize - Short.BYTES);
+                    System.out.println(currentId + ":GET NEXT Registro Morto.");
+                    continue;
+                }
+
+                byte[] registryBytes = new byte[registrySize - Short.BYTES];
+                if (raf.getFilePointer() + registrySize - Short.BYTES >= raf.length()) return null;
+
+                raf.readFully(registryBytes);
+
+                return BinaryDocument.fromByteArray(currentId, registryBytes);
+            } while (raf.getFilePointer() < raf.length());
+        } catch (Exception e) {}
+
+        return null;
+    }
 }
 
