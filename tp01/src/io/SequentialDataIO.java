@@ -11,6 +11,10 @@ public class SequentialDataIO implements DataIO {
         this.path = path;
     }
 
+    public String getPath() {
+        return path;
+    }
+
     @Override
     public void createRegistry(Document document) {
         try (RandomAccessFile raf = new RandomAccessFile(path, "rw")) {
@@ -140,8 +144,6 @@ public class SequentialDataIO implements DataIO {
                 int registrySize = raf.readInt();
                 boolean isRegistryDeleted = raf.readBoolean();
                 currentId = raf.readShort();
-                System.out.println(currentId);
-
 
                 if (isRegistryDeleted) {
                     raf.skipBytes(registrySize - Short.BYTES);
@@ -150,7 +152,6 @@ public class SequentialDataIO implements DataIO {
                 }
 
                 byte[] registryBytes = new byte[registrySize - Short.BYTES];
-                if (raf.getFilePointer() + registrySize - Short.BYTES >= raf.length()) return null;
 
                 raf.readFully(registryBytes);
 
