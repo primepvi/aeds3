@@ -10,7 +10,7 @@ import java.util.List;
 public class Document {
     protected final Movie movie;
 
-    protected Document(Movie movie) {
+    public Document(Movie movie) {
         this.movie = movie;
     }
 

@@ -5,7 +5,7 @@ import utils.Document;
 import java.io.*;
 
 public class SequentialDataIO implements DataIO {
-    private final String path;
+    private String path;
 
     public SequentialDataIO(String path) {
         this.path = path;
@@ -14,9 +14,10 @@ public class SequentialDataIO implements DataIO {
     public String getPath() {
         return path;
     }
+    public void setPath(String path) { this.path = path; }
 
     @Override
-    public void createRegistry(Document document) {
+    public BinaryDocument createRegistry(Document document) {
         try (RandomAccessFile raf = new RandomAccessFile(path, "rw")) {
             short lastId = 0;
 
@@ -38,9 +39,13 @@ public class SequentialDataIO implements DataIO {
             raf.writeInt(bytes.length);
             raf.writeBoolean(false);
             raf.write(bytes);
+
+            return binaryDocument;
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
+
+        return null;
     }
 
     @Override
@@ -57,7 +62,7 @@ public class SequentialDataIO implements DataIO {
 
                 if (isRegistryDeleted) {
                     raf.skipBytes(registrySize - Short.BYTES);
-                    System.out.println(currentId + ":GET Registro Morto.");
+                    // System.out.println(currentId + ":GET Registro Morto.");
                     continue;
                 }
 
@@ -93,7 +98,7 @@ public class SequentialDataIO implements DataIO {
 
                 if (isRegistryDeleted) {
                     raf.skipBytes(registrySize - Short.BYTES);
-                    System.out.println(currentId + ":DELETE Registro Morto.");
+                    // System.out.println(currentId + ":DELETE Registro Morto.");
                     continue;
                 }
 
@@ -147,7 +152,7 @@ public class SequentialDataIO implements DataIO {
 
                 if (isRegistryDeleted) {
                     raf.skipBytes(registrySize - Short.BYTES);
-                    System.out.println(currentId + ":GET NEXT Registro Morto.");
+                    // System.out.println(currentId + ":GET NEXT Registro Morto.");
                     continue;
                 }
 
@@ -157,7 +162,8 @@ public class SequentialDataIO implements DataIO {
 
                 return BinaryDocument.fromByteArray(currentId, registryBytes);
             } while (raf.getFilePointer() < raf.length());
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         return null;
     }

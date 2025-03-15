@@ -82,7 +82,8 @@ public class ExternOrdinate {
             int currentPathCount = pathCount - intercalationCount;
 
             for (int i = 0; i < currentPathCount; i++) {
-                String intercalationFilename = "dist/int_temp_" + intercalationCount + "." + i;
+                String intercalationFilename = currentPathCount == 1 ? "res/new_movies.db" :
+                        "dist/int_temp_" + intercalationCount + "." + i;
                 RandomAccessFile intercalationRaf = new RandomAccessFile(intercalationFilename, "rw");
                 intercalationRafs.add(intercalationRaf);
             };
@@ -119,15 +120,19 @@ public class ExternOrdinate {
             distributionRafs = new ArrayList<>(currentPathCount);
             intercalationRafs = new ArrayList<>(currentPathCount);
 
-            for (int i = 0; i < currentPathCount; i++) {
-                String distributionFilename = "dist/int_temp_" + intercalationCount + "." + i;
-                RandomAccessFile distributionRaf = new RandomAccessFile(distributionFilename, "r");
-                distributionRafs.add(distributionRaf);
-            };
+            if (currentPathCount != 1) {
+                for (int i = 0; i < currentPathCount; i++) {
+                    String distributionFilename = "dist/int_temp_" + intercalationCount + "." + i;
+                    RandomAccessFile distributionRaf = new RandomAccessFile(distributionFilename, "r");
+                    distributionRafs.add(distributionRaf);
+                }
+            }
 
             intercalationCount++;
             currentBlockSize *= 2;
         }
+
+
     }
 
     private short handleIntercalate(
